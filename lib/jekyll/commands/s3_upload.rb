@@ -9,8 +9,6 @@ module Jekyll
             c.syntax      'upload [options]'
             c.description 'Upload the site to the S3 bucket.'
             c.option 'environment', '--environment ENVIRONMENT', 'The environment to upload to.'
-            c.option 'quiet', '-q', '--quiet', 'Silence output.'
-            c.option 'verbose', '-V', '--verbose', 'Print verbose output.'
 
             c.action do |args, options|
               Jekyll::Commands::S3Upload.process(options)
@@ -58,10 +56,10 @@ module Jekyll
             upload_validations.each do |validation_class_name|
               Jekyll.logger.info "Running Upload Validation #{validation_class_name}"
               validation_class = validation_class_name.constantize
-              valid = validation_class.validate(site, Jekyll.logger)
+              valid = validation_class.validate(jekyll_config, site, Jekyll.logger)
               next if valid
 
-              Jekyll.logger.info "Upload Validation #{validation_class_name} failed. Halting upload."
+              Jekyll.logger.error "Upload Validation #{validation_class_name} failed. Halting upload."
               return false
             end
             Jekyll.logger.info 'All Upload Validations passed.'

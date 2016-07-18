@@ -10,6 +10,7 @@ module Jekyll
           @aws_secret_access_key = options.fetch(:aws_secret_access_key)
           @aws_region = options.fetch(:aws_region)
           @s3_bucket = options.fetch(:s3_bucket)
+          @s3_prefix_path = options.fetch(:s3_prefix_path)
           @build_directory = options.fetch(:build_directory)
           @file_strategy = options.fetch(:file_strategy)
           @logger = options.fetch(:logger)
@@ -34,7 +35,7 @@ module Jekyll
 
         private
 
-        attr_reader :aws_access_key_id, :aws_secret_access_key, :aws_region, :build_directory, :file_strategy, :logger, :s3_bucket
+        attr_reader :aws_access_key_id, :aws_secret_access_key, :aws_region, :build_directory, :file_strategy, :logger, :s3_bucket, :s3_prefix_path
 
         def upload_built_files!(s3, upload_timestamp)
           build_dir_pathame = Pathname.new(build_directory)
@@ -45,11 +46,16 @@ module Jekyll
             file_pathname = Pathname.new(file)
             file_path_relative_to_build_directory = file_pathname.relative_path_from(build_dir_pathame).to_s
 
+            key = if s3_prefix_path.empty?
+                    file_path_relative_to_build_directory
+                  else
+                    File.join(s3_prefix_path, file_path_relative_to_build_directory)
+                  end
             options = {
               acl: 'public-read',
               body: File.open(file),
               bucket: s3_bucket,
-              key: file_path_relative_to_build_directory
+              key: key
             }
 
             options[:content_type] = Rack::Mime.mime_type(File.extname(file))

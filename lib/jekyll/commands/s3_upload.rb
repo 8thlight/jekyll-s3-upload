@@ -74,6 +74,7 @@ module Jekyll
             aws_secret_access_key: aws_secret_access_key,
             aws_region: aws_region,
             s3_bucket: s3_bucket,
+            s3_prefix_path: s3_upload_config.fetch('prefix_path', ''),
             build_directory: jekyll_config.fetch('destination'),
             file_strategy: Jekyll::S3::Upload::UploaderFileConfigStrategy.new(s3_upload_config),
             logger: ActiveSupport::TaggedLogging.new(Jekyll.logger.writer)

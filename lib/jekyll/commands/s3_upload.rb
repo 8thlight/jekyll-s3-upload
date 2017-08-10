@@ -75,6 +75,9 @@ module Jekyll
             aws_region: aws_region,
             s3_bucket: s3_bucket,
             s3_prefix_path: s3_upload_config.fetch('prefix_path', ''),
+            s3_index_path: s3_upload_config.fetch('index_path', 'index.html'),
+            s3_error_path: s3_upload_config.fetch('error_path', 'error.html'),
+            s3_routing_rules_path: s3_upload_config.fetch('routing_rules_path', nil),
             build_directory: jekyll_config.fetch('destination'),
             file_strategy: Jekyll::S3::Upload::UploaderFileConfigStrategy.new(s3_upload_config),
             logger: ActiveSupport::TaggedLogging.new(Jekyll.logger.writer)

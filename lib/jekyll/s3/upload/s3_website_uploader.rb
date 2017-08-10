@@ -11,6 +11,9 @@ module Jekyll
           @aws_region = options.fetch(:aws_region)
           @s3_bucket = options.fetch(:s3_bucket)
           @s3_prefix_path = options.fetch(:s3_prefix_path)
+          @s3_index_path = options.fetch(:s3_index_path)
+          @s3_error_path = options.fetch(:s3_error_path)
+          @s3_routing_rules_path = options.fetch(:s3_routing_rules_path)
           @build_directory = options.fetch(:build_directory)
           @file_strategy = options.fetch(:file_strategy)
           @logger = options.fetch(:logger)
@@ -26,6 +29,7 @@ module Jekyll
             secret_access_key: aws_secret_access_key
           })
 
+          update_website_configuration!(s3)
           upload_built_files!(s3, start)
 
           logger.info "Upload complete!"
@@ -35,7 +39,29 @@ module Jekyll
 
         private
 
-        attr_reader :aws_access_key_id, :aws_secret_access_key, :aws_region, :build_directory, :file_strategy, :logger, :s3_bucket, :s3_prefix_path
+        attr_reader :aws_access_key_id, :aws_secret_access_key, :aws_region,
+          :build_directory, :file_strategy, :logger, :s3_bucket,
+          :s3_prefix_path, :s3_routing_rules_path, :s3_error_path, :s3_index_path
+
+        def update_website_configuration!(s3)
+          if s3_routing_rules_path
+            routing_rules = YAML.load(s3_routing_rules_path)
+          else
+            routing_rules = nil
+          end
+
+          s3.put_bucket_website(
+            bucket: s3_bucket,
+            website_configuration: {
+              error_document: {
+                key: s3_error_path
+              }, index_document: {
+                suffix: s3_index_path
+              },
+              routing_rules: routing_rules
+            }
+          )
+        end
 
         def upload_built_files!(s3, upload_timestamp)
           build_dir_pathame = Pathname.new(build_directory)

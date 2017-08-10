@@ -45,7 +45,7 @@ module Jekyll
 
         def update_website_configuration!(s3)
           if s3_routing_rules_path
-            routing_rules = YAML.load(s3_routing_rules_path)
+            routing_rules = YAML.load_file(s3_routing_rules_path)
           else
             routing_rules = nil
           end

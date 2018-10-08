@@ -16,6 +16,8 @@ module Jekyll
           @s3_routing_rules_path = options.fetch(:s3_routing_rules_path)
           @build_directory = options.fetch(:build_directory)
           @file_strategy = options.fetch(:file_strategy)
+          redirect_config_path = options.fetch(:website_redirect_config_path)
+          @website_redirect_config = YAML.load_file(redirect_config_path) if redirect_config_path
           @logger = options.fetch(:logger)
         end
 
@@ -41,7 +43,8 @@ module Jekyll
 
         attr_reader :aws_access_key_id, :aws_secret_access_key, :aws_region,
           :build_directory, :file_strategy, :logger, :s3_bucket,
-          :s3_prefix_path, :s3_routing_rules_path, :s3_error_path, :s3_index_path
+          :s3_prefix_path, :s3_routing_rules_path, :s3_error_path, :s3_index_path,
+          :website_redirect_config
 
         def update_website_configuration!(s3)
           if s3_routing_rules_path
@@ -104,6 +107,11 @@ module Jekyll
         end
 
         def extract_redirect_location(file_path_relative_to_build_directory)
+          if website_redirect_config
+            website_redirect_config.fetch(file_path_relative_to_build_directory, nil)
+          else
+            nil
+          end
         end
 
       end

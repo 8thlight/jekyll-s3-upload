@@ -80,6 +80,7 @@ module Jekyll
             s3_routing_rules_path: s3_upload_config.fetch('routing_rules_path', nil),
             build_directory: jekyll_config.fetch('destination'),
             file_strategy: Jekyll::S3::Upload::UploaderFileConfigStrategy.new(s3_upload_config),
+            website_redirect_config_path: s3_upload_config.fetch('website_redirect_config_path', nil),
             logger: ActiveSupport::TaggedLogging.new(Jekyll.logger.writer)
           })
 
